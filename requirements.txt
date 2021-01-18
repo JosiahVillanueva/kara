@@ -7,7 +7,7 @@ opencv-python==4.2.0.34
 numpy==1.17.3
 scikit-image==0.16.2
 Werkzeug==0.15.3
-pytesseract==v5.0.0
+#pytesseract==v5.0.0
 
 
 # absl-py==0.9.0
