@@ -1,6 +1,5 @@
 import errno
 import io, cv2
-import matplotlib.pyplot as plt
 import numpy as np
 from os import listdir, makedirs
 from os.path import isfile, join
