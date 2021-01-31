@@ -6,11 +6,10 @@ import pytesseract
 import re
 
 import app.lib.pyimgscan.tools as tools
-from app.lib.deskew import determine_skew
 
-def rotate(
-        image: np.ndarray, angle: float, background: Union[int, Tuple[int, int, int]]
-):
+#pytesseract.pytesseract.tesseract_cmd = '/usr/share/tesseract-ocr'
+
+def rotate(image=np.ndarray, angle=float, background=Union[int, Tuple[int, int, int]]):
     old_width, old_height = image.shape[:2]
     angle_radian = math.radians(angle)
     width = abs(np.sin(angle_radian) * old_height) + abs(np.cos(angle_radian) * old_width)
@@ -36,6 +35,8 @@ def findAngle(image, documentType, center = None, scale = 1.0):
 
     return angle
 
+
+#USED
 def deskew_img(image, documentType):
     print("DESKEW_IMG")
     grayscale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -55,18 +56,7 @@ def deskew_img(image, documentType):
 
     return padded_img, avg_brightness
 
-def unsharp_mask(image, kernel_size=(7, 7), sigma=1.0, amount=6.0, threshold=0):
-    """Return a sharpened version of the image, using an unsharp mask."""
-    blurred = cv2.GaussianBlur(image, kernel_size, sigma)
-    sharpened = float(amount + 1) * image - float(amount) * blurred
-    sharpened = np.maximum(sharpened, np.zeros(sharpened.shape))
-    sharpened = np.minimum(sharpened, 255 * np.ones(sharpened.shape))
-    sharpened = sharpened.round().astype(np.uint8)
-    if threshold > 0:
-        low_contrast_mask = np.absolute(image - blurred) < threshold
-        np.copyto(sharpened, image, where=low_contrast_mask)
-    return sharpened
-
+#USED
 def pyscanimg(image, avg_brightness):
     """
     Main Proccess of the Program
@@ -78,6 +68,7 @@ def pyscanimg(image, avg_brightness):
     img_corrected = tools.perspective_transform(img_adj, corners)
     return img_corrected
 
+#USED
 def remove_shadow(img):
     rgb_planes = cv2.split(img)
 
@@ -93,6 +84,7 @@ def remove_shadow(img):
 
     return cv2.merge(result_planes)
 
+#USED
 def sharpen(img_grey):
     kernel = np.array([[0, -1, 0], \
                       [-1, 5,-1], \
@@ -113,36 +105,3 @@ def align(img, documentType="", color="bw"):
         return image_sharpened
     else:
         return None
-
-def deskew_image(image):
-    # convert the image to grayscale and flip the foreground
-    # and background to ensure foreground is now "white" and
-    # the background is "black"
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    gray = cv2.bitwise_not(gray)
-    # threshold the image, setting all foreground pixels to
-    # 255 and all background pixels to 0
-    thresh = cv2.threshold(gray, 0, 255,
-    	cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-    # grab the (x, y) coordinates of all pixel values that
-    # are greater than zero, then use these coordinates to
-    # compute a rotated bounding box that contains all
-    # coordinates
-    coords = np.column_stack(np.where(thresh > 0))
-    angle = cv2.minAreaRect(coords)[-1]
-    # the `cv2.minAreaRect` function returns values in the
-    # range [-90, 0); as the rectangle rotates clockwise the
-    # returned angle trends to 0 -- in this special case we
-    # need to add 90 degrees to the angle
-    if angle < -45:
-    	angle = -(90 + angle)
-    # otherwise, just take the inverse of the angle to make
-    # it positive
-    else:
-    	angle = -angle
-    # rotate the image to deskew it
-    (h, w) = image.shape[:2]
-    center = (w // 2, h // 2)
-    M = cv2.getRotationMatrix2D(center, angle, 1.0)
-    rotated = cv2.warpAffine(image, M, (w, h),
-    	flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
