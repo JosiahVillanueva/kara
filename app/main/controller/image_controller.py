@@ -8,6 +8,7 @@ from PIL import Image
 from ..util.alignment import align
 from ..util.dto import ImageProcessingDto
 from ..util.decorator import upload_parser, multiple_image_parser
+from lobe import ImageModel
 
 api = ImageProcessingDto.api
 model_parser = ImageProcessingDto.model_parser
@@ -43,3 +44,22 @@ class Realignment(Resource):
         file_object.seek(0)
 
         return send_file(file_object, mimetype='image/PNG')
+    
+
+@api.route("/predict")
+@api.expect(upload_parser.add_argument("color", type=str, location="form", required=False))
+class Predict(Resource):
+    @api.doc("Image recognition, recognize uploaded image thru Lobe Tensorflow")
+    def post(self):
+        image = request.files["file"]
+        # Directory of the Tensorflow exported on Lobe
+        model = ImageModel.load('C:\\Project\\kara-master\\kara-master_v2\\kara\\app\\main\\imagerecognition')
+        result = model.predict_from_file(image)
+        labels = []
+    
+        for label, confidence in result.labels:
+            labels.append([label, confidence])
+        
+        result = {"Labels": labels, "Prediction": result.prediction}
+        
+        return result
