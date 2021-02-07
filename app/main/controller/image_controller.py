@@ -53,7 +53,8 @@ class Predict(Resource):
     def post(self):
         image = request.files["file"]
         # Directory of the Tensorflow exported on Lobe
-        model = ImageModel.load('C:\\Project\\kara-master\\kara-master_v2\\kara\\app\\main\\imagerecognition')
+        # model = ImageModel.load('C:\\Project\\kara-master\\kara-master_v2\\kara\\app\\main\\imagerecognition')
+        model = ImageModel.load('/var/www/html/kara/app/main/imagerecognition')
         result = model.predict_from_file(image)
         labels = []
     
