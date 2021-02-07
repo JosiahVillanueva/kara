@@ -38,7 +38,6 @@ def findAngle(image, documentType, center = None, scale = 1.0):
 
 #USED
 def deskew_img(image, documentType):
-    print("DESKEW_IMG")
     grayscale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     
     # Blur the image

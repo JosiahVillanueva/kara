@@ -42,7 +42,8 @@ class Realignment(Resource):
         img.save(file_object, 'PNG')
         # move to beginning of file so `send_file()` it will read from start    
         file_object.seek(0)
-
+        print(send_file(file_object, mimetype='image/PNG'))
+        
         return send_file(file_object, mimetype='image/PNG')
     
 
@@ -53,8 +54,8 @@ class Predict(Resource):
     def post(self):
         image = request.files["file"]
         # Directory of the Tensorflow exported on Lobe
-        # model = ImageModel.load('C:\\Project\\kara-master\\kara-master_v2\\kara\\app\\main\\imagerecognition')
-        model = ImageModel.load('/var/www/html/kara/app/main/imagerecognition')
+        model = ImageModel.load('C:\\Project\\kara-master\\kara-master_v2\\kara\\app\\main\\imagerecognition')
+        #model = ImageModel.load('/var/www/html/kara/app/main/imagerecognition')
         result = model.predict_from_file(image)
         labels = []
     
@@ -62,5 +63,6 @@ class Predict(Resource):
             labels.append([label, confidence])
         
         result = {"Labels": labels, "Prediction": result.prediction}
+        print(result)
         
         return result
