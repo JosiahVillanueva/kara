@@ -7,13 +7,14 @@ from PIL import Image
 
 from ..util.alignment import align
 from ..util.dto import ImageProcessingDto
-from ..util.decorator import upload_parser, multiple_image_parser
+from ..util.decorator import upload_parser, upload_predict, multiple_image_parser
 from lobe import ImageModel
 
 api = ImageProcessingDto.api
 model_parser = ImageProcessingDto.model_parser
 upload_parser_with_model = upload_parser(model_parser)
 upload_parser = upload_parser()
+upload_predict = upload_predict()
 multiple_image_parser = multiple_image_parser()
 
 def convert_to_cv2_image(werkzeug_image_file):
@@ -26,6 +27,7 @@ def convert_to_cv2_image(werkzeug_image_file):
 
 @api.route("/scan-img")
 @api.expect(upload_parser.add_argument("color", type=str, location="form", required=False))
+@api.expect(upload_parser.add_argument("documentType", type=str, location="form", required=False))
 class Realignment(Resource):
     @api.doc("Automatically scans an image")
     def post(self):
@@ -48,14 +50,14 @@ class Realignment(Resource):
     
 
 @api.route("/predict")
-@api.expect(upload_parser.add_argument("color", type=str, location="form", required=False))
+@api.expect(upload_predict)
 class Predict(Resource):
     @api.doc("Image recognition, recognize uploaded image thru Lobe Tensorflow")
     def post(self):
         image = request.files["file"]
         # Directory of the Tensorflow exported on Lobe
-        #model = ImageModel.load('C:\\Project\\kara-master\\kara-master_v2\\kara\\app\\main\\imagerecognition')
-        model = ImageModel.load('/var/www/html/kara/app/main/imagerecognition')
+        model = ImageModel.load('C:\\Project\\kara-master\\kara-master_v2\\kara\\app\\main\\imagerecognition')
+        #model = ImageModel.load('/var/www/html/kara/app/main/imagerecognition')
         result = model.predict_from_file(image)
         labels = []
     
