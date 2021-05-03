@@ -26,7 +26,7 @@ Windows `tf-venv/Scripts/activate`
 
 Install the the dependencies for the example
 
-`python -m pip install --upgrade pip && pip install -r ICROCR_Lobe/OCRTensorFlow/example/requirements.txt`
+`python -m pip install --upgrade pip && pip install -r requirements.txt`
 
 Run the example and see the model output
 
